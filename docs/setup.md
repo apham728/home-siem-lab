@@ -4,7 +4,7 @@ Step-by-step record of how I built the lab.
 
 **Host machine:** "Intel i9-12900k, 32 GB RAM, Windows 11"  
 **Date built:** 11-12-2026  
-**Time to complete:** xx hours
+**Time to complete:** xx hours (11/12/26 11 PM to 
 
 ---
 
@@ -20,15 +20,13 @@ Step-by-step record of how I built the lab.
 
 ## 2. Network setup
 
-I used a VirtualBox NAT Network instead of bridged networking so the lab VMs are isolated from my home network while I run attack simulations.
-
 1. VirtualBox > File > Tools > Network > NAT Networks > Create
 2. Name: `siemlab`, range: `10.0.2.0/24`, DHCP enabled
 3. Port forwarding rule: Host `127.0.0.1:8443` -> Wazuh server `:443` (Guest Port)
 
-`screenshots/01-nat-network.png`
+![Nat Network Config](../screenshots/01-nat-network.png)
 
-**Why this design:** [explain in your own words]
+**Why this design:** I used a VirtualBox NAT Network so the lab VMs are isolated from my home network while I run attack simulations later.
 
 ## 3. Wazuh server VM
 
