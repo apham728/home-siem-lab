@@ -2,9 +2,8 @@
 
 Step-by-step record of how I built the lab.
 
-**Host machine:** "Intel i9-12900k, 32 GB RAM, Windows 11"  
-**Date built:** 11-12-2026  
-**Time to complete:** xx hours (11/12/26 11 PM to 
+**Host machine:** Intel i9-12900k, 32 GB RAM, Windows 11  
+**Date built:** 11-12-2026
 
 ---
 
@@ -12,8 +11,8 @@ Step-by-step record of how I built the lab.
 
 | Item | Version | Source |
 |---|---|---|
-| VirtualBox + Extension Pack | 7.2.22 | virtualbox.org |
-| Ubuntu Server ISO | 24.04 LTS (live-server, amd64) | releases.ubuntu.com/24.04/ |
+| VirtualBox + Extension Pack | 7.2.22 | [https://virtualbox.org/wiki/Downloads](https://www.virtualbox.org/wiki/Downloads) |
+| Ubuntu Server ISO | 24.04 LTS (live-server, amd64) | [releases.ubuntu.com/24.04/](https://releases.ubuntu.com/24.04/) |
 | Windows 11 Enterprise evaluation ISO | 26H2 | Microsoft Evaluation Center |
 | Sysmon | [version] | Microsoft Sysinternals |
 | Sysmon config | [name, e.g. SwiftOnSecurity] | GitHub |
@@ -22,7 +21,9 @@ Step-by-step record of how I built the lab.
 
 1. VirtualBox > File > Tools > Network > NAT Networks > Create
 2. Name: `siemlab`, range: `10.0.2.0/24`, DHCP enabled
-3. Port forwarding rule: Host `127.0.0.1:8443` -> Wazuh server `:443` (Guest Port)
+3. Click on Port Forwarding tab
+4. Create new port forwarding rule on IPv4: Host `127.0.0.1:8443` -> Wazuh server `10.0.2.0:443` (Guest Port)
+5. Apply
 
 ![Nat Network Config](../screenshots/01-nat-network.png)
 
@@ -37,7 +38,22 @@ Step-by-step record of how I built the lab.
 | RAM | 8 GB |
 | Disk | 50 GB |
 | Network | NAT Network `siemlab` |
-| IP address | [e.g. 10.0.2.4] |
+| IP address | 10.0.2.4 |
+
+1. VirtualBox > Machine > New
+2. Name: `Wazuh Server`
+3. Set ISO Image to the Ubuntu Live Server ISO
+4. Ensure VM settings look like the following screenshots:
+![Wazuh VM Settings](../screenshots/02-wazuh-vm.png)
+![Wazuh VM Settings](../screenshots/03-wazuh-vm.png)
+![Wazuh VM Settings](../screenshots/04-wazuh-vm.png)
+5. Click Finish
+6. Open settings for newly made Wazuh Server VM
+7. Network > Adapter 1 > Attached to: NAT Network
+8. Select `siemlab`  
+![Wazuh VM Network Setting](../screenshots/06-wazuh-vm-network.png)
+9. Click Ok
+
 
 ### Install Wazuh
 
@@ -131,7 +147,7 @@ Add an entry every time something breaks. This section is one of the most valuab
 
 | Problem | Cause | Fix |
 |---|---|---|
-| [e.g. Agent showed "Never connected"] | [e.g. wrong manager IP] | [e.g. corrected ossec.conf and restarted] |
+| ["Failed to save the settings of the virtual machine" (VERR_PATH_NOT_FOUND)](../screenshots/troubleshooting-path-not-found.png) | [Folder for VM was missing](../screenshots/troubleshooting-path-not-found-cause.png) | Removed VM from VirtualBox and recreated it |
 | | | |
 
 ## 9. Snapshots
