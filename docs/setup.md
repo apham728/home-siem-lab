@@ -1,6 +1,4 @@
-# Setup Guide
-
-Step-by-step record of how I built the lab.
+Step by step record of how I built the lab.
 
 **Host machine:** Intel i9-12900k, 32 GB RAM, Windows 11  
 **Date built:** 11-12-2026
@@ -91,16 +89,14 @@ ssh -p 2222 labadmin@127.0.0.1
 curl -sO https://packages.wazuh.com/4.14/wazuh-install.sh && sudo bash ./wazuh-install.sh -a
 ```
 
-- Install time: [e.g. about 15 minutes]
-- Retrieved credentials with:
-  ```bash
-  sudo tar -O -xvf wazuh-install-files.tar wazuh-install-files/wazuh-passwords.txt
-  ```
-- Accessed dashboard at `https://127.0.0.1:8443` (accepted the self-signed certificate warning)
+- Install time: ~15 minutes
+5. Access dashboard at `https://127.0.0.1:8443` (accept the self-signed certificate warning; Advanced > Proceed)
+6. Log in using the credentials given after installing Wazuh in Powershell
 
-📷 `screenshots/02-dashboard-first-login.png`
+![Dashboard](../screenshots/13-dashboard.png)
 
-**Snapshot taken:** `wazuh-server-clean`
+7. Take a snapshot of the VM after successfully installing Wazuh: Machine > Take Snapshot
+8. Enter the snapshot name as `wazuh server install`
 
 ## 4. Windows VM
 
@@ -175,16 +171,16 @@ Add an entry every time something breaks. This section is one of the most valuab
 
 | Problem | Cause | Fix |
 |---|---|---|
-| ["Failed to save the settings of the virtual machine" (VERR_PATH_NOT_FOUND)](../screenshots/troubleshooting-path-not-found.png) | [Folder for VM was missing](../screenshots/troubleshooting-path-not-found-cause.png) | Removed VM from VirtualBox and recreated it |
-| | | |
+| ["Failed to save the settings of the virtual machine" (VERR_PATH_NOT_FOUND)](../screenshots/troubleshooting-path-not-found.png) | [Folder for VM was missing](../screenshots/troubleshooting-path-not-found-cause.png) | [Removed VM from VirtualBox and recreated it](../screenshots/troubleshooting-path-not-found-fix.png) |
+| [Wazuh dashboard installation failed and rolled back](../screenshots/troubleshoot-dashboard-install-fail.png)| [Ubuntu only gave 24GB to the system with another 24GB unallocated, causing Wazuh dashboard installation to run out of space while extracting](../screenshots/troubleshoot-dashboard-install-fail-cause.png) | [Ran `sudo lvextend -r -l +100%FREE /dev/ubuntu-vg/ubuntu-lv` to extend system space and then reran installer](../screenshots/troubleshoot-dashboard-install-fail-fix.png) |
 
 ## 9. Snapshots
 
 | Snapshot | VM | State |
 |---|---|---|
-| `wazuh-server-clean` | Wazuh server | Fresh install, dashboard working |
-| `win11-clean-install` | Windows 11 | Before agent or Sysmon |
-| `win11-agent-sysmon` | Windows 11 | Agent and Sysmon configured |
+| `ubuntu fresh install` | Wazuh Server | Fresh install of Ubuntu |
+| `wazuh server install` | Wazuh Server | Fresh install of Wazuh with dashboard working |
+||||
 
 Roll back to `win11-agent-sysmon` after each round of attack simulations.
 
