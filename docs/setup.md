@@ -11,7 +11,7 @@ Step by step record of how I built the lab.
 |---|---|---|
 | VirtualBox | 7.2.22 | [https://virtualbox.org/wiki/Downloads](https://www.virtualbox.org/wiki/Downloads) |
 | Ubuntu Server ISO | 24.04 LTS (live-server, amd64) | [releases.ubuntu.com/24.04/](https://releases.ubuntu.com/24.04/) |
-| Windows 11 Enterprise evaluation ISO | 26H2 | Microsoft Evaluation Center |
+| Windows 11 Enterprise evaluation ISO | 26H2 | [Microsoft Evaluation Center](https://info.microsoft.com/ww-landing-windows-11-enterprise.html) |
 | Sysmon | [version] | Microsoft Sysinternals |
 | Sysmon config | [name, e.g. SwiftOnSecurity] | GitHub |
 
@@ -102,16 +102,26 @@ curl -sO https://packages.wazuh.com/4.14/wazuh-install.sh && sudo bash ./wazuh-i
 
 | Setting | Value |
 |---|---|
-| OS | Windows 11 Enterprise (evaluation) |
+| OS | Windows 11 Enterprise |
 | vCPUs | 2 |
 | RAM | 4 GB |
 | Disk | 60 GB |
 | Network | NAT Network `siemlab` |
 | Local account | Throwaway lab account (no Microsoft account) |
 
-Steps:
-1. Enabled EFI and TPM 2.0 in VM settings
-2. Installed Windows from ISO
+1. VirtualBox > Machine > New
+2. Name: `Windows 11`
+3. Set ISO Image to the Windows 11 ISO
+4. Ensure VM settings look like the following screenshots:
+![Windows VM Settings](../screenshots/14-windows-vm.png)
+![Windows VM Settings](../screenshots/15-windows-vm.png)
+![Windows VM Settings](../screenshots/16-windows-vm.png)
+5. Click Finish
+6. Open settings for newly made Wazuh Server VM
+7. Network > Adapter 1 > Attached to: NAT Network
+8. Select `siemlab`
+9. System > TPM Version > 2.0
+2. 
 3. Installed VirtualBox Guest Additions
 4. Verified connectivity to the server:
    ```powershell
@@ -173,6 +183,7 @@ Add an entry every time something breaks. This section is one of the most valuab
 |---|---|---|
 | ["Failed to save the settings of the virtual machine" (VERR_PATH_NOT_FOUND)](../screenshots/troubleshooting-path-not-found.png) | [Folder for VM was missing](../screenshots/troubleshooting-path-not-found-cause.png) | [Removed VM from VirtualBox and recreated it](../screenshots/troubleshooting-path-not-found-fix.png) |
 | [Wazuh dashboard installation failed and rolled back](../screenshots/troubleshoot-dashboard-install-fail.png)| [Ubuntu only gave 24GB to the system with another 24GB unallocated, causing Wazuh dashboard installation to run out of space while extracting](../screenshots/troubleshoot-dashboard-install-fail-cause.png) | [Ran `sudo lvextend -r -l +100%FREE /dev/ubuntu-vg/ubuntu-lv` to extend system space and then reran installer](../screenshots/troubleshoot-dashboard-install-fail-fix.png) |
+| Windows 11 VM got stuck on a black screen |  ||
 
 ## 9. Snapshots
 
