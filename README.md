@@ -1,6 +1,6 @@
 # Home SIEM Lab: Wazuh Detection in VirtualBox
 
-> One sentence summary: A virtualized SIEM lab where I deployed Wazuh, collected Windows endpoint telemetry with Sysmon, simulated attacker techniques, and wrote custom detection rules mapped to MITRE ATT&CK.
+> A virtualized SIEM lab where I deployed Wazuh, collected Windows endpoint telemetry with Sysmon, simulated attacker techniques, and wrote custom detection rules mapped to MITRE ATT&CK.
 
 **Status:** In progress  
 **Last updated:** 2026-11-12
@@ -19,7 +19,7 @@
 | Windows 11 VM | Monitored endpoint | Windows 11 Enterprise eval, 2 vCPU, 4 GB RAM, 60 GB disk |
 | Network | Isolated VirtualBox NAT Network (`siemlab`) | Dashboard reached via host port forward 8443 -> 443 |
 
-**Design decision:** I used a NAT Network as it allows the VMs to be on a private and isolated virtual network instead of using my home network. 
+**Design decision:** I used a NAT Network because it isolates my VMs from my home network, using the host computer as a virtual router.  This also gives mores security/safety to my home network from anything I'm working on in my VMs and prevents anything leaking into my home network.
 
 ## Tools Used
 
@@ -30,8 +30,6 @@
 - (Add anything else: Hydra, Wireshark, etc.)
 
 ## Setup Summary
-
-Short version of what you did. Link to the detailed steps rather than pasting everything here.
 
 1. Created the isolated network and VMs
 2. Installed Wazuh server
