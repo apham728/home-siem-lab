@@ -11,7 +11,7 @@ Step-by-step record of how I built the lab.
 
 | Item | Version | Source |
 |---|---|---|
-| VirtualBox + Extension Pack | 7.2.22 | [https://virtualbox.org/wiki/Downloads](https://www.virtualbox.org/wiki/Downloads) |
+| VirtualBox | 7.2.22 | [https://virtualbox.org/wiki/Downloads](https://www.virtualbox.org/wiki/Downloads) |
 | Ubuntu Server ISO | 24.04 LTS (live-server, amd64) | [releases.ubuntu.com/24.04/](https://releases.ubuntu.com/24.04/) |
 | Windows 11 Enterprise evaluation ISO | 26H2 | Microsoft Evaluation Center |
 | Sysmon | [version] | Microsoft Sysinternals |
@@ -22,10 +22,9 @@ Step-by-step record of how I built the lab.
 1. VirtualBox > File > Tools > Network > NAT Networks > Create
 2. Name: `siemlab`, range: `10.0.2.0/24`, DHCP enabled
 3. Click on Port Forwarding tab
-4. Create new port forwarding rule on IPv4: Host `127.0.0.1:8443` -> Wazuh server `10.0.2.0:443` (Guest Port)
-5. Apply
-
+4. Create new port forwarding rule on IPv4: Host `127.0.0.1:8443` -> Wazuh server `:443` (Guest Port)
 ![Nat Network Config](../screenshots/01-nat-network.png)
+5. Apply
 
 **Why this design:** I used a VirtualBox NAT Network so the lab VMs are isolated from my home network while I run attack simulations later.
 
@@ -53,15 +52,44 @@ Step-by-step record of how I built the lab.
 8. Select `siemlab`  
 ![Wazuh VM Network Setting](../screenshots/06-wazuh-vm-network.png)
 9. Click Ok
-
+10. Run the VM by double clicking on it
+11. Ensure you see a screen similar to below and press Enter
+![Initial Ubuntu Installer Menu](../screenshots/07-ubuntu-installer.png)
+12. Use UP and DOWN arrow keys to navigate the languages and Enter to select (I chose English)
+13. Press Enter again (Continue without updating)
+14. Select your keyboard layout and press Enter on Done
+15. Continue selecting Done until you reach this screen and then select Continue
+![Ubuntu Installer](../screenshots/08-ubuntu-installer.png)
+16. Set the profile as the following (use a password you will remember) and select Done
+![Profile Setup](../screenshots/09-ubuntu-installer.png)
+17. Skip upgrading to Ubuntu Pro and continue
+18. Press Enter to enable Install OpenSSH Server and continue
+19. Don't select any featured server snaps and continue
+20. Wait for the system to finish installing
+21. Once complete, select Reboot Now
+22. If a message appears saying to remove installation medium, press Enter
+23. After the reboot, log in by entering your username, **labadmin**, first and then your password
+24. Find out the server's IP address by entering `ip a`
+![Wazuh Server IP](../screenshots/10-server-ip.png)
+25. Update the port forwarding rule in the `siemlab` NAT Network and change the Guest IP to the address found by `ip a`
+26. Make sure to apply the change
+27. Take a snapshot of the VM in case anything messes up later: Machine > Take Snapshot
+![Taking snapshot](../screenshots/11-taking-snapshot.png)
+28. Enter the snapshot name as `ubuntu fresh install`
 
 ### Install Wazuh
-
+1. Go to `siemlab` in NAT Networks and add a port forwarding rule as follows: Name `ssh` -> Host `127.0.0.1:2222` -> Guest `VM's Address (10.0.2.x):22`
+![SSH rule](../screenshots/12-new-ssh-rule.png)
+2. Open Powershell and run:
+```powershell
+ssh -p 2222 labadmin@127.0.0.1
+```
+3. Enter `yes` and then enter the password for Wazuh Server
+4. Check [documentation.wazuh.com/current/quickstart.html](documentation.wazuh.com/current/quickstart.html) for the latest installer command and run the command (I used version 4.14) 
+   
 ```bash
 curl -sO https://packages.wazuh.com/4.14/wazuh-install.sh && sudo bash ./wazuh-install.sh -a
 ```
-
-> Version numbers change. Check documentation.wazuh.com/current/quickstart.html for the current command. Version I used: [x.y.z]
 
 - Install time: [e.g. about 15 minutes]
 - Retrieved credentials with:
