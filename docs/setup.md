@@ -1,5 +1,4 @@
 Step by step record of how I built the lab.  
-**Date built:** 11-12-2026
 
 ## Host Machine Minimum Requirements
 > 16GB RAM, 120GB free storage, 4 CPU cores. This lab was done on a 16 core, 32GB RAM, and Windows 11 host system.
@@ -15,7 +14,7 @@ Step by step record of how I built the lab.
 | Ubuntu Server ISO | 24.04 LTS (live-server, amd64) | [releases.ubuntu.com/24.04/](https://releases.ubuntu.com/24.04/) |
 | Windows 11 Enterprise evaluation ISO | 26H2 | [Microsoft Evaluation Center](https://info.microsoft.com/ww-landing-windows-11-enterprise.html) |
 | Sysmon | 15.22 | [Microsoft Sysinternals](https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon) |
-| Sysmon config | [SwiftOnSecurity] | [GitHub](https://github.com/SwiftOnSecurity/sysmon-config/blob/master/sysmonconfig-export.xml) |
+| Sysmon config | SwiftOnSecurity | [GitHub](https://github.com/SwiftOnSecurity/sysmon-config/blob/master/sysmonconfig-export.xml) |
 
 ## 2. Network setup
 
@@ -25,8 +24,6 @@ Step by step record of how I built the lab.
 4. Create new port forwarding rule on IPv4: Host `127.0.0.1:8443` -> Wazuh server `:443` (Guest Port)
 ![Nat Network Config](../screenshots/01-nat-network.png)
 5. Apply
-
-**Why this design:** I used a VirtualBox NAT Network so the lab VMs are isolated from my home network while I run attack simulations later.
 
 ## 3. Wazuh server VM
 
@@ -91,9 +88,9 @@ ssh -p 2222 labadmin@127.0.0.1
 curl -sO https://packages.wazuh.com/4.14/wazuh-install.sh && sudo bash ./wazuh-install.sh -a
 ```
 
-- Install time: ~15 minutes
 5. Access dashboard at `https://127.0.0.1:8443` (accept the self-signed certificate warning; Advanced > Proceed)
-6. Log in using the credentials given after installing Wazuh in PowerShell (!! note down your credentials in case you forget !!)
+6. Log in using the credentials given after installing Wazuh in PowerShell
+> List credentials by running `sudo tar -O -xvf wazuh-install-files.tar wazuh-install-files/wazuh-passwords.txt`
 
 ![Dashboard](../screenshots/13-dashboard.png)
 
@@ -162,7 +159,8 @@ curl -sO https://packages.wazuh.com/4.14/wazuh-install.sh && sudo bash ./wazuh-i
 
 ## 6. Sysmon
 > In Windows 11 VM
-1. Install Sysmon with the SwiftOnSecurity config by running the following in Administrator PowerShell:  
+1. Install Sysmon with the SwiftOnSecurity config by running the following in Administrator PowerShell:
+> Note: All future commands will be done in Admin Powershell  
    ```powershell
    mkdir C:\Sysmon
    cd C:\Sysmon
@@ -188,27 +186,31 @@ curl -sO https://packages.wazuh.com/4.14/wazuh-install.sh && sudo bash ./wazuh-i
    ```powershell
    Restart-Service -Name wazuh
    ```
-4. Generate activity in the VM by running `whoami` and `ipconfig` in PowerShell
-5. Check dashboard for `sysmon` under your `win11-lab` agent
-
-
-📷 `screenshots/04-sysmon-events.png`
-
-**Snapshot taken:** `win11-agent-sysmon`
+4. Generate test activity in the VM by running the following in PowerShell:
+   ```powershell
+   cmd.exe /c whoami
+   ```
+5. Verify the event
+   1. In the dashboard, go to Threat Hunting > Events, make sure the `win11-lab` agent is selected, search for `sysmon`
+   2. Look for a log entry that reads `Suspicious Windows cmd shell execution`
+   3. Expand the log and confirm the fields `data.win.eventdata.commandLine:` whoami, `data.win.eventdata.image:` C:\\Windows\\System32\\whoami.exe, `data.win.eventdata.user:` DESKTOP-...\\admin  
+![Verifying log](../screenshots/23-log-activity.png)
+![Verifying log](../screenshots/24-log-activity.png)
+6. Take snapshot of VM: Machine > Take Snapshot
+7. Name: `win11 sysmon`
 
 ## 7. Verification
 
 Generated test activity and confirmed it appeared in the dashboard:
+> Documentation for other Sysmon events can be found at [https://learn.microsoft.com/en-us/windows/security/operating-system-security/sysmon/sysmon-events](https://learn.microsoft.com/en-us/windows/security/operating-system-security/sysmon/sysmon-events)
 
 | Action on Windows VM | Expected result | Seen in Wazuh? |
 |---|---|---|
-| Ran `whoami` and `Get-Process` | Sysmon process-creation events | [Yes/No] |
-| Failed logins at lock screen | Failed logon alerts | [Yes/No] |
-| [your own test] | | |
+| `cmd.exe /c whoami` | Sysmon logs process creation event (Event ID 1) and Wazuh shows alert for `whoami.exe` | [Yes, log gave commandLine `whoami.exe`, ran by user `DESKTOP-...\\admin`](../screenshots/25-test1-seen-in-wazuh.png) |
+| `New-Item -Path "$env:USERPROFILE\Desktop\test.exe" -ItemType File` | Sysmon logs file creation event (Event ID 11) and Wazuh shows a log for `test.exe`  | [Yes, log gave targetFileName `C:\\Users\\admin\\Desktop\\test.exe`, ran by user `DESKTOP-AUPH20S\\admin`](../screenshots/26-test2-seen-in-wazuh.png) |
+
 
 ## 8. Troubleshooting log
-
-Add an entry every time something breaks. This section is one of the most valuable parts of the project.
 
 | Problem | Cause | Fix |
 |---|---|---|
@@ -219,8 +221,6 @@ Add an entry every time something breaks. This section is one of the most valuab
 - Registry Key Path
   - ```HKLM\SYSTEM\CurrentControlSet\Control\DeviceGuard\Scenarios\HypervisorEnforcedCodeIntegrity```
 
-
-
 ## 9. Snapshots
 
 | Snapshot | VM | State |
@@ -228,9 +228,8 @@ Add an entry every time something breaks. This section is one of the most valuab
 | `ubuntu fresh install` | Wazuh Server | Fresh install of Ubuntu |
 | `wazuh server install` | Wazuh Server | Fresh install of Wazuh with dashboard working |
 | `win11 clean install` | Windows 11 | Fresh install of Windows 11 |
-| `win11 agent install` | Windows 11| Windows 11 after deploying Wazuh agent |
-
-Roll back to `win11-agent-sysmon` after each round of attack simulations.
+| `win11 agent install` | Windows 11 | Windows 11 after deploying Wazuh agent |
+| `win11 sysmon` | Windows 11 | Windows 11 after verifying Sysmon works |
 
 ## 10. Next steps
 
