@@ -7,14 +7,15 @@ Step by step record of how I built the lab.
 ---
 
 ## 1. Prerequisites
+> Note: Files for Sysmon and its config are listed but downloading them is unnecessary
 
 | Item | Version | Source |
 |---|---|---|
 | VirtualBox | 7.2.22 | [https://virtualbox.org/wiki/Downloads](https://www.virtualbox.org/wiki/Downloads) |
 | Ubuntu Server ISO | 24.04 LTS (live-server, amd64) | [releases.ubuntu.com/24.04/](https://releases.ubuntu.com/24.04/) |
 | Windows 11 Enterprise evaluation ISO | 26H2 | [Microsoft Evaluation Center](https://info.microsoft.com/ww-landing-windows-11-enterprise.html) |
-| Sysmon | [version] | Microsoft Sysinternals |
-| Sysmon config | [name, e.g. SwiftOnSecurity] | GitHub |
+| Sysmon | 15.22 | [Microsoft Sysinternals](https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon) |
+| Sysmon config | [SwiftOnSecurity] | [GitHub](https://github.com/SwiftOnSecurity/sysmon-config/blob/master/sysmonconfig-export.xml) |
 
 ## 2. Network setup
 
@@ -160,22 +161,36 @@ curl -sO https://packages.wazuh.com/4.14/wazuh-install.sh && sudo bash ./wazuh-i
 8. Name: `win11 agent install`
 
 ## 6. Sysmon
-
-1. Installed Sysmon with the [config name] configuration:
+> In Windows 11 VM
+1. Install Sysmon with the SwiftOnSecurity config by running the following in Administrator PowerShell:  
    ```powershell
-   .\Sysmon64.exe -accepteula -i [config file].xml
+   mkdir C:\Sysmon
+   cd C:\Sysmon
+   Invoke-WebRequest -Uri https://download.sysinternals.com/files/Sysmon.zip -OutFile Sysmon.zip
+   Expand-Archive Sysmon.zip -DestinationPath . -Force
+   Invoke-WebRequest -Uri https://raw.githubusercontent.com/SwiftOnSecurity/sysmon-config/master/sysmonconfig-export.xml -OutFile sysmonconfig-export.xml
+   .\Sysmon64.exe -accepteula -i sysmonconfig-export.xml
    ```
-2. Added this block to `C:\Program Files (x86)\ossec-agent\ossec.conf`:
+2. Tell the Wazuh agent to collect Sysmon logs
+   1. Run the command in PowerShell:  
+   ```powershell
+   notepad "C:\Program Files (x86)\ossec-agent\ossec.conf"
+   ```
+   2. Find the last `</ossec_config>` near the bottom and paste the following just above it:
    ```xml
    <localfile>
-     <location>Microsoft-Windows-Sysmon/Operational</location>
-     <log_format>eventchannel</log_format>
+   <location>Microsoft-Windows-Sysmon/Operational</location>
+   <log_format>eventchannel</log_format>
    </localfile>
    ```
-3. Restarted the agent:
+   3. Press `Ctrl + S` to save the updated file
+3. Restart the agent in PowerShell by running:
    ```powershell
    Restart-Service -Name wazuh
    ```
+4. Generate activity in the VM by running `whoami` and `ipconfig` in PowerShell
+5. Check dashboard for `sysmon` under your `win11-lab` agent
+
 
 📷 `screenshots/04-sysmon-events.png`
 
