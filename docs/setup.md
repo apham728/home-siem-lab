@@ -1,7 +1,8 @@
-Step by step record of how I built the lab.
-
-**Host machine:** Intel i9-12900k, 32 GB RAM, Windows 11  
+Step by step record of how I built the lab.  
 **Date built:** 11-12-2026
+
+## Host Machine Minimum Requirements
+> 16GB RAM, 120GB free storage, 4 CPU cores. This lab was done on a 16 core, 32GB RAM, and Windows 11 host system.
 
 ---
 
@@ -91,7 +92,7 @@ curl -sO https://packages.wazuh.com/4.14/wazuh-install.sh && sudo bash ./wazuh-i
 
 - Install time: ~15 minutes
 5. Access dashboard at `https://127.0.0.1:8443` (accept the self-signed certificate warning; Advanced > Proceed)
-6. Log in using the credentials given after installing Wazuh in Powershell
+6. Log in using the credentials given after installing Wazuh in Powershell (!! note down your credentials in case you forget !!)
 
 ![Dashboard](../screenshots/13-dashboard.png)
 
@@ -107,7 +108,7 @@ curl -sO https://packages.wazuh.com/4.14/wazuh-install.sh && sudo bash ./wazuh-i
 | RAM | 4 GB |
 | Disk | 60 GB |
 | Network | NAT Network `siemlab` |
-| Local account | Throwaway lab account (no Microsoft account) |
+| Local account | Offline account (no Microsoft account) |
 
 1. VirtualBox > Machine > New
 2. Name: `Windows 11`
@@ -121,18 +122,30 @@ curl -sO https://packages.wazuh.com/4.14/wazuh-install.sh && sudo bash ./wazuh-i
 7. Network > Adapter 1 > Attached to: NAT Network
 8. Select `siemlab`
 9. System > TPM Version > 2.0
-2. 
-3. Installed VirtualBox Guest Additions
-4. Verified connectivity to the server:
+10. Click Ok
+11. Run the VM by double clicking on it
+12. Go through the installation for Windows 11 until you reach the sign in screen
+13. Create an offline account for the VM  
+![Create offline Microsoft account](../screenshots/17-w11-login.png)
+14. Choose your username and password credentials and set your security questions
+16. Select "Update later" and continue letting Windows install
+17. Install VirtualBox Guest Additions   
+![Install Guest Additions](../screenshots/18-guest-additions.png)
+18. Choose "Reboot Now" after installing Guest Additions
+19. After rebooting, go Devices > Shared Clipboard > Bidirectional (Allows copy and paste between host and VM)
+20. Take snapshot of VM: Machine > Take Snapshot
+21. Name: `win11 clean install`
+22. Open back up the VirtualBox Manager, run the Wazuh Server VM, and allow a few minutes for the Wazuh indexer, manager, and dashboard to begin running
+23. Open Powershell on your Windows 11 VM and test your connection to Wazuh by running:
    ```powershell
    Test-NetConnection [server IP] -Port 1515
    ```
-
-**Snapshot taken:** `win11-clean-install`
+24. Ensure you see that the test passed  
+![Connection Test Passed](../screenshots/19-connection-test.png)
 
 ## 5. Connect the Wazuh agent
 
-1. Dashboard > Endpoints > Deploy new agent
+1. Wazuh Dashboard > Endpoints > Deploy new agent
 2. Selected Windows, entered the server's internal IP, named the agent `win11-lab`
 3. Ran the generated command in an Administrator PowerShell
 4. Started the service:
