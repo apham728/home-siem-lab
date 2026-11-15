@@ -156,6 +156,8 @@ curl -sO https://packages.wazuh.com/4.14/wazuh-install.sh && sudo bash ./wazuh-i
    ```
 6. Around a minute after starting the service, confirm the agent is **Active** in the agent list  
 ![Agent Active](../screenshots/22-agent-active.png)
+7. Take snapshot of VM: Machine > Take Snapshot
+8. Name: `win11 agent install`
 
 ## 6. Sysmon
 
@@ -210,7 +212,8 @@ Add an entry every time something breaks. This section is one of the most valuab
 |---|---|---|
 | `ubuntu fresh install` | Wazuh Server | Fresh install of Ubuntu |
 | `wazuh server install` | Wazuh Server | Fresh install of Wazuh with dashboard working |
-||||
+| `win11 clean install` | Windows 11 | Fresh install of Windows 11 |
+| `win11 agent install` | Windows 11| Windows 11 after deploying Wazuh agent |
 
 Roll back to `win11-agent-sysmon` after each round of attack simulations.
 
