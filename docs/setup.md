@@ -79,7 +79,7 @@ Step by step record of how I built the lab.
 ### Install Wazuh
 1. Go to `siemlab` in NAT Networks and add a port forwarding rule as follows: Name `ssh` -> Host `127.0.0.1:2222` -> Guest `VM's Address (10.0.2.x):22`
 ![SSH rule](../screenshots/12-new-ssh-rule.png)
-2. Open Powershell and run:
+2. Open PowerShell and run:
 ```powershell
 ssh -p 2222 labadmin@127.0.0.1
 ```
@@ -92,7 +92,7 @@ curl -sO https://packages.wazuh.com/4.14/wazuh-install.sh && sudo bash ./wazuh-i
 
 - Install time: ~15 minutes
 5. Access dashboard at `https://127.0.0.1:8443` (accept the self-signed certificate warning; Advanced > Proceed)
-6. Log in using the credentials given after installing Wazuh in Powershell (!! note down your credentials in case you forget !!)
+6. Log in using the credentials given after installing Wazuh in PowerShell (!! note down your credentials in case you forget !!)
 
 ![Dashboard](../screenshots/13-dashboard.png)
 
@@ -136,7 +136,7 @@ curl -sO https://packages.wazuh.com/4.14/wazuh-install.sh && sudo bash ./wazuh-i
 20. Take snapshot of VM: Machine > Take Snapshot
 21. Name: `win11 clean install`
 22. Open back up the VirtualBox Manager, run the Wazuh Server VM, and allow a few minutes for the Wazuh indexer, manager, and dashboard to begin running
-23. Open Powershell on your Windows 11 VM and test your connection to Wazuh by running:
+23. Open PowerShell on your Windows 11 VM and test your connection to Wazuh by running:
    ```powershell
    Test-NetConnection [server IP] -Port 1515
    ```
@@ -145,16 +145,17 @@ curl -sO https://packages.wazuh.com/4.14/wazuh-install.sh && sudo bash ./wazuh-i
 
 ## 5. Connect the Wazuh agent
 
-1. Wazuh Dashboard > Endpoints > Deploy new agent
-2. Selected Windows, entered the server's internal IP, named the agent `win11-lab`
-3. Ran the generated command in an Administrator PowerShell
-4. Started the service:
+1. Wazuh Dashboard > Deploy new agent
+![Deploying New Agent](../screenshots/20-dashboard-agent.png)
+2. Select Windows as the package, enter the server's IP `10.0.2.x` , enter the agent name `win11-lab`
+3. Copy and run the given command inside of Administrator PowerShell  
+![Administrator PowerShell](../screenshots/21-admin-powershell.png)
+5. Start the service:
    ```powershell
    NET START WazuhSvc
    ```
-5. Confirmed the agent shows **Active** in the dashboard
-
-📷 `screenshots/03-agent-active.png`
+6. Around a minute after starting the service, confirm the agent is **Active** in the agent list  
+![Agent Active](../screenshots/22-agent-active.png)
 
 ## 6. Sysmon
 
