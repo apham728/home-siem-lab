@@ -2,11 +2,9 @@
 
 > A virtualized SIEM lab where I deployed Wazuh, collected Windows endpoint telemetry with Sysmon, simulated attacker techniques, and wrote custom detection rules mapped to MITRE ATT&CK.
 
-**Status:** In progress  
-**Last updated:** 2026-11-12
-
 ## Objectives
 - Learn about log collection and detection rule writing
+- Understand more about log analysis
 - Capture logs from Wazuh through Sysmon  
 
 ## Architecture
@@ -16,7 +14,7 @@
 | Component | Role | Specs |
 |---|---|---|
 | Wazuh server VM | Manager, indexer, dashboard | Ubuntu Server 24.04, 4 vCPU, 8 GB RAM, 50 GB disk |
-| Windows 11 VM | Monitored endpoint | Windows 11 Enterprise eval, 2 vCPU, 4 GB RAM, 60 GB disk |
+| Windows 11 VM | Monitored endpoint | Windows 11 Enterprise, 2 vCPU, 4 GB RAM, 60 GB disk |
 | Network | Isolated VirtualBox NAT Network (`siemlab`) | Dashboard reached via host port forward 8443 -> 443 |
 
 **Design decision:** I used a NAT Network because it isolates my VMs from my home network, using the host computer as a virtual router.  This also gives mores security/safety to my home network from anything I'm working on in my VMs and prevents anything leaking into my home network.
@@ -24,10 +22,13 @@
 ## Tools Used
 
 - VirtualBox 7.2.22
+- Ubuntu Server 24.04 ISO
+- Windows 11 Enterprise 26H2 ISO 
 - Wazuh 4.14.10 (all-in-one deployment)
-- Sysmon + [config name/source]
-- Atomic Red Team
-- (Add anything else: Hydra, Wireshark, etc.)
+- Sysmon 15.22 + SwiftOnSecurity Config
+- Atomic Red Team (planned)
+
+**Design decision:** I used the SwiftOnSecurity Sysmon config rather than Sysmon out of the box as it is well documented and readable. It focuses on logging events worth analyzing (file creation, process creation, DNS queries, etc.) while filtering out noise that would otherwise flood the logs.
 
 ## Setup Summary
 
@@ -38,57 +39,6 @@
 5. Took snapshots at each stable point
 
 Full steps: [docs/setup.md](docs/setup.md)
-
-## Attack Simulations and Detections
-
-| # | Technique (MITRE ID) | How I simulated it | Detected by default? | Rule / Alert ID | Notes |
-|---|---|---|---|---|---|
-| 1 | Brute force (T1110) | Repeated failed logons | Yes / No | | |
-| 2 | (Technique name, ID) | (Atomic test number or command) | | | |
-| 3 | | | | | |
-
-### Custom rules
-
-Rules I wrote are in [`rules/local_rules.xml`](rules/local_rules.xml).
-
-For each one, explain:
-- What behavior it detects
-- Which log source it relies on
-- Why you wrote it (what the default rules missed)
-- How you tested it
-
-### Tuning
-
-Describe any false positives you saw and what you changed to reduce them.
-
-## Results
-
-- Techniques tested: N
-- Detected out of the box: N
-- Detected after custom rules: N
-- Still not detected: N (and why)
-
-![Dashboard screenshot](screenshots/dashboard-alerts.png)
-
-## Challenges and What I Learned
-
-Be specific. Real problems you hit and how you solved them are the best part of the writeup.
-
-- **Problem:** (e.g., agent showed "Never connected")
-  **Cause:** (e.g., wrong manager IP in ossec.conf)
-  **Fix:** (e.g., corrected the IP and restarted the service)
-- **Problem:**
-  **Cause:**
-  **Fix:**
-
-## Limitations and Next Steps
-
-Honest gaps and what you would do with more time.
-
-- (e.g., Only one endpoint, so no lateral movement scenarios)
-- (e.g., Add a Linux agent and test SSH brute force)
-- (e.g., Integrate a threat intel feed)
-- (e.g., Try Wazuh active response to block repeated failed logins)
 
 ## Repository Layout
 
