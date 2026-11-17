@@ -22,13 +22,15 @@
 </group>
 ```
 
-The rule detects when several discovery commands/tools are ran from the same shell within a certain timeframe (30 seconds). It relies on detecting a process creation log in order to send out an alert with the ID T1016 to signify multiple tools were ran in a short amount of time.   
+The rule detects several discovery tools (`arp`, `nbtstat`, `net`, `ipconfig`, `netsh`) run from the same parent process within 30 seconds. It relies on Sysmon's process creation event in order to send out an alert with the ID T1016 with rule 100031 to signify multiple tools share a parent process.  
 
-This rule was made because the alerts sent from Wazuh's default rules sent out multiple generic alerts like `Suspicious Windows cmd shell execution` and `Discovery activity executed`, which could be easily overlooked. I wanted to make a rule that targeted this type of behavior and sent out a more specific alert that would make it more noticeable.  
+I wrote this rule because the alerts sent from Wazuh's default rules produced multiple generic alerts for the T1016 test, like `Suspicious Windows cmd shell execution` and `Discovery activity executed`, which could be easily overlooked. I wanted to make a rule that targeted this type of behavior and sent out a more specific alert that would allow analysts to tell someone is looking through their network. 
 
-I tested this custom rule by running the T1016 test 1 in the PowerShell and seeing what ID would appear in Wazuh event dashboard.  
+I tested this custom rule by running Atomic test T1016-1 and confirming that rule 100031 was sent out along with the T1016 tag.  
 **Before**
-![Alerts before rule](../screenshots/atomic-test-2-before-rule.png)  
+![Alerts before rule](../screenshots/atomic-test-2-before-rule.png)
+> Before: no alert was tagged with T1016 and the logs seem generic enough that someone might ignore it
 
 **After**
 ![Alerts before rule](../screenshots/atomic-test-2-after-rule.png)
+> After: a log with the rule 100031 is seen and it is tagged with T1016
