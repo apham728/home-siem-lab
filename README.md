@@ -26,7 +26,7 @@
 - Windows 11 Enterprise 26H2 ISO 
 - Wazuh 4.14.10 (all-in-one deployment)
 - Sysmon 15.22 + SwiftOnSecurity Config
-- Atomic Red Team (planned)
+- Atomic Red Team
 
 **Design decision:** I used the SwiftOnSecurity Sysmon config rather than Sysmon out of the box as it is well documented and readable. It focuses on logging events worth analyzing (file creation, process creation, DNS queries, etc.) while filtering out noise that would otherwise flood the logs.
 
@@ -39,6 +39,9 @@
 5. Took snapshots at each stable point
 
 Full steps: [docs/setup.md](docs/setup.md)
+
+## Attack Simulations and Detections
+Attack simulations are documented at: [tests/atomic-tests.md](docs/atomic-tests.md) 
 
 ## Repository Layout
 
