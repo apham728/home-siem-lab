@@ -34,45 +34,46 @@ Step by step record of how I built the lab.
 | RAM | 8 GB |
 | Disk | 50 GB |
 | Network | NAT Network `siemlab` |
-| IP address | 10.0.2.4 |
+| IP address | 10.0.2.5 |
 
 1. VirtualBox > Machine > New
 2. Name: `Wazuh Server`
 3. Set ISO Image to the Ubuntu Live Server ISO
-4. Ensure VM settings look like the following screenshots:
+4. Uncheck `Proceed with Unattended Installation`
+5. Ensure VM settings look like the following screenshots:
 ![Wazuh VM Settings](../screenshots/02-wazuh-vm.png)
 ![Wazuh VM Settings](../screenshots/03-wazuh-vm.png)
 ![Wazuh VM Settings](../screenshots/04-wazuh-vm.png)
-5. Click Finish
-6. Open settings for newly made Wazuh Server VM
-7. Network > Adapter 1 > Attached to: NAT Network
-8. Select `siemlab`  
+6. Click Finish
+7. Open settings for newly made Wazuh Server VM
+8. Network > Adapter 1 > Attached to: NAT Network
+9. Select `siemlab`  
 ![Wazuh VM Network Setting](../screenshots/06-wazuh-vm-network.png)
-9. Click Ok
-10. Run the VM by double clicking on it
-11. Ensure you see a screen similar to below and press Enter
+10. Click Ok
+11. Run the VM by double clicking on it
+12. Ensure you see a screen similar to below and press Enter
 ![Initial Ubuntu Installer Menu](../screenshots/07-ubuntu-installer.png)
-12. Use UP and DOWN arrow keys to navigate the languages and Enter to select (I chose English)
-13. Press Enter again (Continue without updating)
-14. Select your keyboard layout and press Enter on Done
-15. Continue selecting Done until you reach this screen and then select Continue
+13. Use UP and DOWN arrow keys to navigate the languages and Enter to select (I chose English)
+14. Press Enter again (Continue without updating)
+15. Select your keyboard layout and press Enter on Done
+16. Continue selecting Done until you reach this screen and then select Continue
 ![Ubuntu Installer](../screenshots/08-ubuntu-installer.png)
-16. Set the profile as the following (use a password you will remember) and select Done
+17. Set the profile as the following (use a password you will remember) and select Done
 ![Profile Setup](../screenshots/09-ubuntu-installer.png)
-17. Skip upgrading to Ubuntu Pro and continue
-18. Press Enter to enable Install OpenSSH Server and continue
-19. Don't select any featured server snaps and continue
-20. Wait for the system to finish installing
-21. Once complete, select Reboot Now
-22. If a message appears saying to remove installation medium, press Enter
-23. After the reboot, log in by entering your username, **labadmin**, first and then your password
-24. Find out the server's IP address by entering `ip a`
+18. Skip upgrading to Ubuntu Pro and continue
+19. Press Enter to enable Install OpenSSH Server and continue
+20. Don't select any featured server snaps and continue
+21. Wait for the system to finish installing
+22. Once complete, select Reboot Now
+23. If a message appears saying to remove installation medium, press Enter
+24. After the reboot, log in by entering your username, **labadmin**, first and then your password
+25. Find out the server's IP address by entering `ip a`
 ![Wazuh Server IP](../screenshots/10-server-ip.png)
-25. Update the port forwarding rule in the `siemlab` NAT Network and change the Guest IP to the address found by `ip a`
-26. Make sure to apply the change
-27. Take a snapshot of the VM in case anything messes up later: Machine > Take Snapshot
+26. Update the port forwarding rule in the `siemlab` NAT Network and change the Guest IP to the address found by `ip a`
+27. Make sure to apply the change
+28. Take a snapshot of the VM in case anything messes up later: Machine > Take Snapshot
 ![Taking snapshot](../screenshots/11-taking-snapshot.png)
-28. Enter the snapshot name as `ubuntu fresh install`
+29. Enter the snapshot name as `ubuntu fresh install`
 
 ### Install Wazuh
 1. Go to `siemlab` in NAT Networks and add a port forwarding rule as follows: Name `ssh` -> Host `127.0.0.1:2222` -> Guest `VM's Address (10.0.2.x):22`
@@ -82,7 +83,7 @@ Step by step record of how I built the lab.
 ssh -p 2222 labadmin@127.0.0.1
 ```
 3. Enter `yes` and then enter the password for Wazuh Server
-4. Check [documentation.wazuh.com/current/quickstart.html](documentation.wazuh.com/current/quickstart.html) for the latest installer command and run the command (I used version 4.14) 
+4. Check [https://documentation.wazuh.com/current/quickstart.html](https://documentation.wazuh.com/current/quickstart.html) for the latest installer command and run the command (I used version 4.14) 
    
 ```bash
 curl -sO https://packages.wazuh.com/4.14/wazuh-install.sh && sudo bash ./wazuh-install.sh -a
@@ -206,8 +207,8 @@ Generated test activity and confirmed it appeared in the dashboard:
 
 | Action on Windows VM | Expected result | Seen in Wazuh? |
 |---|---|---|
-| `cmd.exe /c whoami` | Sysmon logs process creation event (Event ID 1) and Wazuh shows alert for `whoami.exe` | [Yes, log gave commandLine `whoami.exe`, ran by user `DESKTOP-...\\admin`](../screenshots/25-test1-seen-in-wazuh.png) |
-| `New-Item -Path "$env:USERPROFILE\Desktop\test.exe" -ItemType File` | Sysmon logs file creation event (Event ID 11) and Wazuh shows a log for `test.exe`  | [Yes, log gave targetFileName `C:\\Users\\admin\\Desktop\\test.exe`, ran by user `DESKTOP-AUPH20S\\admin`](../screenshots/26-test2-seen-in-wazuh.png) |
+| `cmd.exe /c whoami` | Sysmon logs process creation event (Event ID 1) and Wazuh shows alert for `whoami` | [Yes, log gave commandLine `whoami.exe`, ran by user `DESKTOP-...\\admin`](../screenshots/25-test1-seen-in-wazuh.png) |
+| `New-Item -Path "$env:USERPROFILE\Desktop\test.exe" -ItemType File` | Sysmon logs file creation event (Event ID 11) and Wazuh shows a log for `test.exe`  | [Yes, log gave targetFilename `C:\\Users\\admin\\Desktop\\test.exe`, ran by user `DESKTOP-...\\admin`](../screenshots/26-test2-seen-in-wazuh.png) |
 
 
 ## 8. Troubleshooting log
@@ -220,6 +221,7 @@ Generated test activity and confirmed it appeared in the dashboard:
 
 - Registry Key Path
   - ```HKLM\SYSTEM\CurrentControlSet\Control\DeviceGuard\Scenarios\HypervisorEnforcedCodeIntegrity```
+  - **Note:** Set `Enabled` back to `1` after the lab
 
 ## 9. Snapshots
 
