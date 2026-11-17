@@ -116,7 +116,7 @@ curl -sO https://packages.wazuh.com/4.14/wazuh-install.sh && sudo bash ./wazuh-i
 ![Windows VM Settings](../screenshots/15-windows-vm.png)
 ![Windows VM Settings](../screenshots/16-windows-vm.png)
 5. Click Finish
-6. Open settings for newly made Wazuh Server VM
+6. Open settings for Windows 11 VM
 7. Network > Adapter 1 > Attached to: NAT Network
 8. Select `siemlab`
 9. System > TPM Version > 2.0
@@ -214,7 +214,7 @@ Generated test activity and confirmed it appeared in the dashboard:
 
 | Problem | Cause | Fix |
 |---|---|---|
-| ["Failed to save the settings of the virtual machine" (VERR_PATH_NOT_FOUND)](../screenshots/troubleshooting-path-not-found.png) | [Folder for VM was missing](../screenshots/troubleshooting-path-not-found-cause.png) | [Removed VM from VirtualBox and recreated it](../screenshots/troubleshooting-path-not-found-fix.png) |
+| ["Failed to save the settings of the virtual machine" (VERR_PATH_NOT_FOUND)](../screenshots/troubleshooting-path-not-found.png) | [Folder for VM was missing](../screenshots/troubleshooting-path-not-found-cause.png) | [Removed VM from VirtualBox and recreated it, properly creating the folder now](../screenshots/troubleshooting-path-not-found-fix.png) |
 | [Wazuh dashboard installation failed and rolled back](../screenshots/troubleshoot-dashboard-install-fail.png)| [Ubuntu only gave 24GB to the system with another 24GB unallocated, causing Wazuh dashboard installation to run out of space while extracting](../screenshots/troubleshoot-dashboard-install-fail-cause.png) | [Ran `sudo lvextend -r -l +100%FREE /dev/ubuntu-vg/ubuntu-lv` to extend system space and then reran installer](../screenshots/troubleshoot-dashboard-install-fail-fix.png) |
 | [Windows 11 VM got stuck on a black screen/loaded very slow](../screenshots/troubleshoot-w11-black-screen.png) | [Windows virtualization based security (Memory Integrity) was enabled, making Windows take main control of CPU virtualization features and causing VirtualBox to fall back onto a slower path](../screenshots/troubleshoot-w11-black-screen-cause.png) | [Disabled Memory Integrity by setting `Enabled` to `0` in Registry Editor at the registry key below and restarted host](../screenshots/troubleshoot-w11-black-screen-fix.png) |
 
