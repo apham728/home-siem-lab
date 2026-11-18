@@ -41,7 +41,10 @@
 Full steps: [docs/setup.md](docs/setup.md)
 
 ## Attack Simulations and Detections
-Attack simulations are documented at: [tests/atomic-tests.md](docs/atomic-tests.md) 
+Attack simulations are documented at: [tests/atomic-tests.md](tests/atomic-tests.md)
+
+## Custom Detection Rules
+Any custom rules written are in: [rules/custom_rules.md](rules/custom-rules.md)
 
 ## Repository Layout
 
