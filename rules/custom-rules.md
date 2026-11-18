@@ -45,10 +45,15 @@ I wrote this rule because the alerts sent from Wazuh's default rules produced mu
 | Test | Expected | Result |
 |---|---|---|
 | Atomic T1016-1 | An alert with 100031 should be sent | Alert with 100031 was sent along with the T1016 tag |
-| Manually run `ipconfig /all` 4 times from the same PowerShell | No alert | 100030 alert for each `ipconfig /all` and 100031 was sent out after several 100030 alert matches (**false positive**) |  
+| Manually run `ipconfig /all` 4 times from the same PowerShell | No alert | [100030 alert for each `ipconfig /all` and 100031 was sent out after several 100030 alert matches (**false positive**)](../screenshots/atomic-test-2-rule-false-pos.png) |  
+| Manually run 5 different discovery tools from same PowerShell | Alert with 100031 should be sent | Alert with 100031 was sent along with the T1016 tag, just like running Atomic T1016-1 |
 
 **Issues encountered while making it:**
-- Using `<different_field></different_field>` broke rule 100031, while `<same_field></same_field>` worked. I planned to use `<same_field>` to check that several alerts came from the same parent process (`win.eventdata.parentProcessGuid`) while also using `<different_field>` to confirm that each alert came from different executable locations. After testing the rule with only each field at a time, I found out that `<different_field>` caused 100031 to not work properly and removed that from rule 100031.
-- `netsh.exe` doesn't produce a 100030 alert when Atomic test T1016-1 (working on figuring out why)
+- Using `<different_field></different_field>` caused rule 100031 to not send, while `<same_field></same_field>` worked. I planned to use `<same_field>` to check that several alerts came from the same parent process (`win.eventdata.parentProcessGuid`) while also using `<different_field>` to confirm that each alert came from different executables. After testing each condition individually, I found out that `<different_field>` caused 100031 to not work properly and removed that from rule 100031.
+- `netsh.exe` did not generate a 100030 alert during Atomic test T1016-1. I confirmed that Sysmon logs `netsh`'s process creation, so I ruled out Sysmon as a potential cause of the problem. I don't know the exact cause but it is most likely due my rule I created. It could be that `netsh` doesn't match any of the rule IDs listed in `<if_sid>` or because of the way the event related to `netsh` is sent to Wazuh.
+- Initally, I had rule 100030 detect rule IDs `92031, 92032, 92036`, matching the Atomic test which ran the its tools through `cmd.exe`. When I typed the commands from the test directly into the terminal though, it didn't send the same alerts. I added rule ID 61603 to the list, Wazuh's rule for Sysmon process creation, so that rule 100030 could identify process creation events related to the discovery tools.  
 
 **Limitations:**
+- Repeating a single tool in the timeframe can also trigger the alert, giving a false positive.
+- An attacker can avoid this detection rule by delaying their commands and sending them over the course of more than 30 seconds, using less than 4 discovery tools, or using other tools that the rule doesn't specify.
+- Actual scripts that someone uses could also trigger this alert
